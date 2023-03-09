@@ -1,0 +1,72 @@
+import unittest
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+
+class TestWebShop(unittest.TestCase):
+    def setUp(self):
+        # Set up Selenium web driver
+        self.driver = webdriver.Chrome()
+        self.driver.maximize_window()
+        self.driver.implicitly_wait(10)
+
+    def test_register_positive(self):
+        # Navigate to the registration page
+        self.driver.get("https://demowebshop.tricentis.com/register")
+
+        # Fill in the registration form
+        self.driver.find_element_by_id("gender-male").click()
+        self.driver.find_element_by_id("FirstName").send_keys("John")
+        self.driver.find_element_by_id("LastName").send_keys("Doe")
+        self.driver.find_element_by_name("DateOfBirthDay").send_keys("12")
+        self.driver.find_element_by_name("DateOfBirthMonth").send_keys("May")
+        self.driver.find_element_by_name("DateOfBirthYear").send_keys("1980")
+        self.driver.find_element_by_id("Email").send_keys("johndoe@example.com")
+        self.driver.find_element_by_id("Password").send_keys("password")
+        self.driver.find_element_by_id("ConfirmPassword").send_keys("password")
+        self.driver.find_element_by_id("register-button").click()
+
+        # Verify successful registration
+        welcome_text = self.driver.find_element_by_class_name("result").text
+        self.assertEqual("Your registration completed", welcome_text)
+
+    def test_register_negative(self):
+        # Navigate to the registration page
+        self.driver.get("https://demowebshop.tricentis.com/register")
+
+        # Fill in the registration form with invalid data
+        self.driver.find_element_by_id("gender-male").click()
+        self.driver.find_element_by_id("FirstName").send_keys("")
+        self.driver.find_element_by_id("LastName").send_keys("")
+        self.driver.find_element_by_id("Email").send_keys("johndoe@example.com")
+        self.driver.find_element_by_id("Password").send_keys("password")
+        self.driver.find_element_by_id("ConfirmPassword").send_keys("password")
+        self.driver.find_element_by_id("register-button").click()
+
+        # Verify error message is displayed
+        error_message = self.driver.find_element_by_css_selector(".validation-summary-errors").text
+        self.assertIn("First name is required", error_message)
+        self.assertIn("Last name is required", error_message)
+
+    def test_login_positive(self):
+        # Navigate to the login page
+        self.driver.get("https://demowebshop.tricentis.com/login")
+
+        # Enter valid credentials and click login button
+        self.driver.find_element_by_id("Email").send_keys("johndoe@example.com")
+        self.driver.find_element_by_id("Password").send_keys("password")
+        self.driver.find_element_by_css_selector("input[value='Log in']").click()
+
+        # Verify login was successful
+        welcome_text = self.driver.find_element_by_class_name("account").text
+        self.assertEqual("Welcome, John Doe!", welcome_text)
+
+    def test_login_negative(self):
+        # Navigate to the login page
+        self.driver.get("https://demowebshop.tricentis.com/login")
+
+        # Enter invalid credentials and click login button
+        self.driver.find_element_by_id("Email").send_keys("joh
